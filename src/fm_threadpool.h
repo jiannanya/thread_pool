@@ -137,7 +137,7 @@ class ThreadPool : public SingletonStackPolicy<ThreadPool> {
 
   private:
     void thread_execute_function(uint_t threadid);
-    bool isRunning() const;
+    bool is_running() const;
 
   private:
     // use unique ptr for internal thread destruction

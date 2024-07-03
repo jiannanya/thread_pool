@@ -1,17 +1,7 @@
 [
 {
   "directory": "C:/CC/src/sandbox/fallment_threadpool/build",
-  "command": "F:\\cc\\programs\\LLVM\\bin\\clang++.exe -IC:/CC/src/sandbox/fallment_threadpool/./src -IC:/CC/src/sandbox/fallment_threadpool/./test -O0 -g -Xclang -gcodeview -D_DEBUG -D_DLL -D_MT -Xclang --dependent-lib=msvcrtd -std=gnu++17 -o CMakeFiles\\main.dir\\main.cc.obj -c C:\\CC\\src\\sandbox\\fallment_threadpool\\main.cc",
+  "command": "F:\\cc\\programs\\LLVM\\bin\\clang++.exe -O0 -g -Xclang -gcodeview -D_DEBUG -D_DLL -D_MT -Xclang --dependent-lib=msvcrtd -std=gnu++17 -o CMakeFiles\\main.dir\\main.cc.obj -c C:\\CC\\src\\sandbox\\fallment_threadpool\\main.cc",
   "file": "C:\\CC\\src\\sandbox\\fallment_threadpool\\main.cc"
-},
-{
-  "directory": "C:/CC/src/sandbox/fallment_threadpool/build",
-  "command": "F:\\cc\\programs\\LLVM\\bin\\clang++.exe -IC:/CC/src/sandbox/fallment_threadpool/./src -IC:/CC/src/sandbox/fallment_threadpool/./test -O0 -g -Xclang -gcodeview -D_DEBUG -D_DLL -D_MT -Xclang --dependent-lib=msvcrtd -std=gnu++17 -o CMakeFiles\\main.dir\\src\\fm_threadpool.cc.obj -c C:\\CC\\src\\sandbox\\fallment_threadpool\\src\\fm_threadpool.cc",
-  "file": "C:\\CC\\src\\sandbox\\fallment_threadpool\\src\\fm_threadpool.cc"
-},
-{
-  "directory": "C:/CC/src/sandbox/fallment_threadpool/build",
-  "command": "F:\\cc\\programs\\LLVM\\bin\\clang++.exe -IC:/CC/src/sandbox/fallment_threadpool/./src -IC:/CC/src/sandbox/fallment_threadpool/./test -O0 -g -Xclang -gcodeview -D_DEBUG -D_DLL -D_MT -Xclang --dependent-lib=msvcrtd -std=gnu++17 -o CMakeFiles\\main.dir\\test\\test.cc.obj -c C:\\CC\\src\\sandbox\\fallment_threadpool\\test\\test.cc",
-  "file": "C:\\CC\\src\\sandbox\\fallment_threadpool\\test\\test.cc"
 }
 ]

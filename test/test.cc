@@ -28,10 +28,10 @@ auto testCase1() -> void {
         [](int d, int e) -> int {
             int sum = 0;
             for (int i = d; i < e; i++) {
-                std::cout << " task 3" << std::endl;
+                // std::cout << " task 3" << std::endl;
                 sum += i;
             }
-
+            std::cout << " task 3 ok" << std::endl;
             return sum;
         },
         1, 100);
@@ -40,10 +40,10 @@ auto testCase1() -> void {
         [](int d, int e) -> int {
             int sum = 0;
             for (int i = d; i < e; i++) {
-                std::cout << " task 4" << std::endl;
+                // std::cout << " task 4" << std::endl;
                 sum += i;
             }
-
+            std::cout << " task 4 ok" << std::endl;
             return sum;
         },
         1, 100);
@@ -52,10 +52,10 @@ auto testCase1() -> void {
         [](int d, int e) -> int {
             int sum = 0;
             for (int i = d; i < e; i++) {
-                std::cout << " task 5" << std::endl;
+                // std::cout << " task 5" << std::endl;
                 sum += i;
             }
-
+            std::cout << " task 5 ok" << std::endl;
             return sum;
         },
         1, 100);

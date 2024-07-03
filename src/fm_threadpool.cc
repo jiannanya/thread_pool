@@ -146,6 +146,8 @@ void ThreadPool::thread_execute_function(uint_t threadid) {
                         }
                     }
                 } else {
+                    std::cout << "wait queue not empty" << threadid
+                              << std::endl;
                     __task_queue_notempty_cv.wait(lock);
                 }
             }
@@ -172,6 +174,6 @@ void ThreadPool::thread_execute_function(uint_t threadid) {
     }
 }
 
-bool ThreadPool::isRunning() const { return __state.__is_pool_running; }
+bool ThreadPool::is_running() const { return __state.__is_pool_running; }
 
 } // namespace fm
