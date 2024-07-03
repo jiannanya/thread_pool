@@ -94,6 +94,7 @@ class ThreadPool : public SingletonStackPolicy<ThreadPool> {
         __task_queue.emplace([task]() { (*task)(); });
 
         __state.__queue_task_nums++;
+        std::cout << "submit task success" << std::endl;
 
         if (__state.__cache_mode == CacheMode::Dynamic &&
             __state.__queue_task_nums > __state.__idle_thread_nums &&

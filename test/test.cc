@@ -27,8 +27,11 @@ auto testCase1() -> void {
     auto res3 = pool->submit(
         [](int d, int e) -> int {
             int sum = 0;
-            for (int i = d; i < e; i++)
+            for (int i = d; i < e; i++) {
+                std::cout << " task 3" << std::endl;
                 sum += i;
+            }
+
             return sum;
         },
         1, 100);
@@ -36,8 +39,11 @@ auto testCase1() -> void {
     auto res4 = pool->submit(
         [](int d, int e) -> int {
             int sum = 0;
-            for (int i = d; i < e; i++)
+            for (int i = d; i < e; i++) {
+                std::cout << " task 4" << std::endl;
                 sum += i;
+            }
+
             return sum;
         },
         1, 100);
@@ -45,8 +51,11 @@ auto testCase1() -> void {
     auto res5 = pool->submit(
         [](int d, int e) -> int {
             int sum = 0;
-            for (int i = d; i < e; i++)
+            for (int i = d; i < e; i++) {
+                std::cout << " task 5" << std::endl;
                 sum += i;
+            }
+
             return sum;
         },
         1, 100);

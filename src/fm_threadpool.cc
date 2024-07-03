@@ -151,7 +151,7 @@ void ThreadPool::thread_execute_function(uint_t threadid) {
             }
 
             __state.__idle_thread_nums--;
-
+            std::cerr << "inter thread get task ok" << std::endl;
             task = __task_queue.front();
             __task_queue.pop();
             __state.__queue_task_nums--;
