@@ -2,7 +2,7 @@ CompileFlags: # Tweak the parse settings
     Add: [
         -xc++,
         -std=c++20,
-        -IC:/CC/src/projects/OpenGLRenderer/thirdparty, #need full path
+        -IrC:/CC/src/sandbox/fallment_threadpool/src, #need full path
         ]
 
 
