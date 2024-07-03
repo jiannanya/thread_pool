@@ -14,7 +14,7 @@ namespace fm {
 
 uint_t InternalThread::__internal_id = 0;
 
-constexpr uint_t TASK_MAX_NUMS = 2;
+constexpr uint_t TASK_MAX_NUMS = 6;
 constexpr uint_t THREAD_MAX_NUMS = 100;
 constexpr uint_t THREAD_MAX_IDLE_TIME = 60; // 60s
 
