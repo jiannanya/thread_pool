@@ -46,7 +46,9 @@ class InternalThread {
     InternalThread(ThreadFunctionType func)
         : __thread_function(func), __thread_id(__internal_id++) {}
 
-    ~InternalThread() = default;
+    ~InternalThread() {
+        std::cout << "inter thread destory " << __thread_id << std::endl;
+    };
 
     void go() {
 

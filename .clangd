@@ -1,8 +1,8 @@
 CompileFlags: # Tweak the parse settings
     Add: [
         -xc++,
-        -std=c++20,
-        -IrC:/CC/src/sandbox/fallment_threadpool/src, #need full path
+        -std=c++17,
+        -IC:/CC/src/sandbox/fallment_threadpool/src, #need full path
         ]
 
 

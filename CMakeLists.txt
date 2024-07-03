@@ -10,6 +10,7 @@ include_directories(./src ./test)
 
 add_executable(${PROJECT_NAME} main.cc)
 
-file(GLOB sources CONFIGURE_DEPENDS src/*.cc test/*.cc)
+file(GLOB sources CONFIGURE_DEPENDS src/*.cc src/*.h test/*.cc test/*.h)
 #message("sources: "${sources})
+
 target_sources(main PUBLIC ${sources})

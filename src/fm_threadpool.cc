@@ -1,5 +1,3 @@
-
-
 #include <atomic>
 #include <condition_variable>
 #include <functional>
@@ -35,7 +33,10 @@ ThreadPool::ThreadPool()
     std::cout << "construct threadpool" << std::endl;
 }
 
-ThreadPool::~ThreadPool() { stop(); }
+ThreadPool::~ThreadPool() {
+    stop();
+    std::cout << "destory threadpool" << std::endl;
+}
 
 void ThreadPool::run(uint_t init_thread_nums) {
 
@@ -119,8 +120,9 @@ void ThreadPool::thread_execute_function(uint_t threadid) {
 
             while (__task_queue.empty()) {
                 if (__state.__is_pool_stopping) {
-                    __internal_threads.clear();
+                    __internal_threads.erase(threadid);
                     __stop_cv.notify_all();
+                    std::cout << "pool stopping" << threadid << std::endl;
                     return;
                 }
 
