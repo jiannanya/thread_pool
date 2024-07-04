@@ -3,6 +3,7 @@
 #include "test.h"
 
 #include <chrono>
+#include <future>
 #include <iostream>
 #include <thread>
 
@@ -20,6 +21,8 @@ int sum2(int a, int b, int c) {
 
 auto testCase1() -> void {
     auto pool = fm::ThreadPool::instance();
+    // auto t = std::async(
+    //     std::launch::async, std::bind(&fm::ThreadPool::run, pool, 5));
     pool->run(5);
 
     auto res1 = pool->submit(sum1, 1, 2);
@@ -59,11 +62,28 @@ auto testCase1() -> void {
             return sum;
         },
         1, 100);
+    std::cout << " get value 0 " << res1.has_value() << res2.has_value()
+              << res3.has_value() << res4.has_value() << res5.has_value()
+              << std::endl;
+    std::cout << " res1 " << (res1.has_value() ? res1.value().get() : -1)
+              << std::endl;
+    std::cout << " get value 1" << std::endl;
+    std::cout << " res2 " << (res2.has_value() ? res2.value().get() : -1)
+              << std::endl;
+    std::cout << " get value 2" << std::endl;
+    std::cout << " res3 " << (res3.has_value() ? res3.value().get() : -1)
+              << std::endl;
+    std::cout << " get value 3" << std::endl;
+    std::cout << " res4 " << (res4.has_value() ? res4.value().get() : -1)
+              << std::endl;
+    std::cout << " get value 4" << std::endl;
+    std::cout << " res5 " << (res5.has_value() ? res5.value().get() : -1)
+              << std::endl;
+    std::cout << " get value 5" << std::endl;
 
-    std::cout << (res1.has_value() ? res1.value().get() : -1) << std::endl;
-    std::cout << (res2.has_value() ? res2.value().get() : -1) << std::endl;
-    std::cout << (res3.has_value() ? res3.value().get() : -1) << std::endl;
-    std::cout << (res4.has_value() ? res4.value().get() : -1) << std::endl;
-    std::cout << (res5.has_value() ? res5.value().get() : -1) << std::endl;
+    // while (1) {
+    // }
+
+    return;
 }
 } // namespace fm::test

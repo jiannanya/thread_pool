@@ -18,6 +18,8 @@
 
 namespace fm {
 
+namespace { // internal linkage
+
 using uint_t = unsigned int;
 
 enum class CacheMode {
@@ -26,46 +28,48 @@ enum class CacheMode {
 };
 
 // for manage thread pool state
-struct ThreadPoolState {
-    uint_t __init_internal_thread_nums;
-    std::atomic_int __current_thread_nums;
-    uint_t __thread_max_threshold;
-    std::atomic_int __idle_thread_nums;
-    std::atomic_int __queue_task_nums;
-    uint_t __task_max_threshold;
+struct PoolState {
+    uint_t __init_worker_nums;
+    std::atomic_int __current_worker_nums;
+    uint_t __worker_max_threshold;
+    std::atomic_int __idle_worker_nums;
+    std::atomic_int __queue_job_nums;
+    uint_t __job_max_threshold;
     CacheMode __cache_mode;
     std::atomic_bool __is_pool_running;
     std::atomic_bool __is_pool_stopping;
 };
 
-class InternalThread {
+class Worker {
     static uint_t __internal_id;
-    using ThreadFunctionType = std::function<void(uint_t)>;
+    using WokerFunctionType = std::function<void(uint_t)>;
 
   public:
-    InternalThread(ThreadFunctionType func)
-        : __thread_function(func), __thread_id(__internal_id++) {}
+    Worker(WokerFunctionType func)
+        : __worker_function(func), __worker_id(__internal_id++) {}
 
-    ~InternalThread() {
-        std::cout << "inter thread destory " << __thread_id << std::endl;
-    };
+    ~Worker() { std::cout << "worker destory " << __worker_id << std::endl; };
 
     void go() {
 
-        std::thread t(__thread_function, __thread_id);
+        std::thread t(__worker_function, __worker_id);
         t.detach();
     }
 
-    uint_t getId() const { return __thread_id; }
+    uint_t getId() const { return __worker_id; }
 
   private:
-    ThreadFunctionType __thread_function;
-    uint_t __thread_id;
+    WokerFunctionType __worker_function;
+    uint_t __worker_id;
 };
+
+uint_t Worker::__internal_id = 0;
+
+} // namespace
 
 class ThreadPool : public SingletonStackPolicy<ThreadPool> {
     friend class SingletonStackPolicy<ThreadPool>;
-    using Task_type = std::function<void()>;
+    using JobType = std::function<void()>;
 
   private:
     ThreadPool();
@@ -77,45 +81,43 @@ class ThreadPool : public SingletonStackPolicy<ThreadPool> {
         -> std::optional<std::future<decltype(func(args...))>> {
 
         using RType = decltype(func(args...));
-        auto task = std::make_shared<std::packaged_task<RType()>>(
+        auto job = std::make_shared<std::packaged_task<RType()>>(
             std::bind(std::forward<Func>(func), std::forward<Args>(args)...));
 
-        std::unique_lock<std::mutex> lock(__task_queue_mutex);
+        std::unique_lock<std::mutex> lock(__job_queue_mutex);
 
-        if (!__task_queue_notfull_cv.wait_for(
+        if (!__job_queue_notfull_cv.wait_for(
                 lock, std::chrono::seconds(1), [&]() -> bool {
-                    return __task_queue.size() < __state.__task_max_threshold;
+                    return __job_queue.size() < __state.__job_max_threshold;
                 })) {
 
             std::cerr << "submit task failed" << std::endl;
 
             return std::nullopt; // queue is full and return null value
         }
-        __task_queue.emplace([task]() { (*task)(); });
+        __job_queue.emplace([job]() { (*job)(); });
 
-        __state.__queue_task_nums++;
+        __state.__queue_job_nums++;
         std::cout << "submit task success" << std::endl;
 
         if (__state.__cache_mode == CacheMode::Dynamic &&
-            __state.__queue_task_nums > __state.__idle_thread_nums &&
-            __state.__current_thread_nums < __state.__thread_max_threshold) {
+            __state.__queue_job_nums > __state.__idle_worker_nums &&
+            __state.__current_worker_nums < __state.__worker_max_threshold) {
 
-            auto new_internal_thread =
-                std::make_unique<InternalThread>(std::bind(
-                    &ThreadPool::thread_execute_function, this,
-                    std::placeholders::_1));
-            uint_t threadId = new_internal_thread->getId();
-            __internal_threads.emplace(
-                threadId, std::move(new_internal_thread));
+            auto new_worker = std::make_unique<Worker>(std::bind(
+                &ThreadPool::worker_execute_function, this,
+                std::placeholders::_1));
+            uint_t threadId = new_worker->getId();
+            __internal_threads.emplace(threadId, std::move(new_worker));
             __internal_threads[threadId]->go(); // 启动线程
 
-            __state.__current_thread_nums++;
-            __state.__idle_thread_nums++;
+            __state.__current_worker_nums++;
+            __state.__idle_worker_nums++;
         }
 
-        __task_queue_notempty_cv.notify_all();
+        __job_queue_notempty_cv.notify_all();
 
-        return std::make_optional(std::move(task->get_future()));
+        return std::make_optional(std::move(job->get_future()));
     }
 
     void run(uint_t init_thread_nums = std::thread::hardware_concurrency());
@@ -136,22 +138,21 @@ class ThreadPool : public SingletonStackPolicy<ThreadPool> {
     uint_t get_thread_max_threshold() const;
 
   private:
-    void thread_execute_function(uint_t threadid);
+    void worker_execute_function(uint_t threadid);
     bool is_running() const;
 
   private:
     // use unique ptr for internal thread destruction
-    std::unordered_map<uint_t, std::unique_ptr<InternalThread>>
-        __internal_threads;
+    std::unordered_map<uint_t, std::unique_ptr<Worker>> __internal_threads;
 
-    std::queue<Task_type> __task_queue;
+    std::queue<JobType> __job_queue;
 
-    std::mutex __task_queue_mutex;
-    std::condition_variable __task_queue_notfull_cv;
-    std::condition_variable __task_queue_notempty_cv;
+    std::mutex __job_queue_mutex;
+    std::condition_variable __job_queue_notfull_cv;
+    std::condition_variable __job_queue_notempty_cv;
     std::condition_variable __stop_cv;
 
-    ThreadPoolState __state;
+    PoolState __state;
 };
 
 } // namespace fm
