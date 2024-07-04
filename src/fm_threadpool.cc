@@ -36,28 +36,26 @@ ThreadPool::~ThreadPool() {
     std::cout << "destory threadpool" << std::endl;
 }
 
-void ThreadPool::run(uint_t init_thread_nums) {
+void ThreadPool::run(uint_t init_worker_nums) {
 
-    if (init_thread_nums > __state.__worker_max_threshold) {
+    if (init_worker_nums > __state.__worker_max_threshold) {
         std::cerr << "init thread nums outbounds" << std::endl;
         return;
     }
 
-    __state.__init_worker_nums = init_thread_nums;
-    __state.__current_worker_nums = init_thread_nums;
+    __state.__init_worker_nums = init_worker_nums;
+    __state.__current_worker_nums = init_worker_nums;
 
     for (uint_t i = 0; i < __state.__init_worker_nums; i++) {
 
-        auto new_internal_thread = std::make_unique<Worker>(std::bind(
+        auto new_worker = std::make_unique<Worker>(std::bind(
             &ThreadPool::worker_execute_function, this, std::placeholders::_1));
-        std::cout << "start running thread" << new_internal_thread->getId()
-                  << std::endl;
-        __internal_threads.emplace(
-            new_internal_thread->getId(), std::move(new_internal_thread));
+        std::cout << "start running thread" << new_worker->getId() << std::endl;
+        workers.emplace(new_worker->getId(), std::move(new_worker));
     }
 
     for (uint_t i = 0; i < __state.__init_worker_nums; i++) {
-        __internal_threads[i]->go();
+        workers[i]->go();
         __state.__idle_worker_nums++;
     }
 
@@ -70,8 +68,7 @@ void ThreadPool::stop() {
         std::unique_lock<std::mutex> lock(__job_queue_mutex);
 
         __job_queue_notempty_cv.notify_all();
-        __stop_cv.wait(
-            lock, [&]() -> bool { return __internal_threads.empty(); });
+        __stop_cv.wait(lock, [&]() -> bool { return workers.empty(); });
 
         __state.__is_pool_running = false;
         __state.__is_pool_stopping = false;
@@ -106,7 +103,7 @@ uint_t ThreadPool::get_thread_max_threshold() const {
     return __state.__worker_max_threshold;
 }
 
-void ThreadPool::worker_execute_function(uint_t threadid) {
+void ThreadPool::worker_execute_function(uint_t worker_id) {
     auto lastTime = std::chrono::high_resolution_clock().now();
 
     while (true) {
@@ -118,9 +115,9 @@ void ThreadPool::worker_execute_function(uint_t threadid) {
 
             while (__job_queue.empty()) {
                 if (__state.__is_pool_stopping) {
-                    __internal_threads.erase(threadid);
+                    workers.erase(worker_id);
                     __stop_cv.notify_all();
-                    std::cout << "pool stopping" << threadid << std::endl;
+                    std::cout << "pool stopping" << worker_id << std::endl;
                     return;
                 }
 
@@ -136,7 +133,7 @@ void ThreadPool::worker_execute_function(uint_t threadid) {
                             __state.__current_worker_nums >
                                 __state.__init_worker_nums) {
 
-                            __internal_threads.erase(threadid);
+                            workers.erase(worker_id);
                             __state.__current_worker_nums--;
                             __state.__idle_worker_nums--;
 
@@ -144,7 +141,7 @@ void ThreadPool::worker_execute_function(uint_t threadid) {
                         }
                     }
                 } else {
-                    std::cout << "wait queue not empty" << threadid
+                    std::cout << "wait queue not empty" << worker_id
                               << std::endl;
                     __job_queue_notempty_cv.wait(lock);
                 }
